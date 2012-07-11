@@ -1,7 +1,7 @@
 /*
  * mockupOverlay plugin for jQuery
  * Displays the layout over the page to help with pixelperfect html/css coding.
- * Version 0.8
+ * Version 0.1
  *
  * Copyright 2012 Hendrik Lammers
  * Dual licensed under the MIT and GPL licenses.
