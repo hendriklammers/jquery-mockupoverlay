@@ -1,0 +1,1 @@
+jQuery plugin that displays an image over your website.
