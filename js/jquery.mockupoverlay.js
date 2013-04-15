@@ -8,6 +8,7 @@
  *
  * http://www.hendriklammers.com
  */
+// TODO: Add options for the container and front/back
 ;(function ($, window, undefined) {
     'use strict';
 
@@ -18,16 +19,13 @@
             top: 0,
             left: 0,
             opacity: 0.3,
-            visible: false
+            visible: true
         };
 
-    function Plugin(element, options) {
+    function Plugin(element, url, options) {
         this.element = element;
+        this.url = url;
 
-        // jQuery has an extend method which merges the contents of two or
-        // more objects, storing the result in the first object. The first object
-        // is generally empty as we don't want to alter the default options for
-        // future instances of the plugin
         this.options = $.extend({}, defaults, options);
 
         this._defaults = defaults;
@@ -36,32 +34,40 @@
         this.init();
     }
 
-    Plugin.prototype.init = function () {
-        var container = this;
-        var isVisible = options.visible;
-        var opacity = options.opacity;
+    Plugin.prototype = {
+        init: function() {
 
-        // Create a new image and wait for it to be loaded
-        var image = new Image();
-        image.src = url;
-        image.onload = function (event) {
+            var self = this;
 
+            // Create a new image and wait for it to be loaded
+            var image = new Image();
+            image.src = this.url;
+            // TODO: Add polyfill?
+            image.onload = this.imageLoaded.bind(this);
+        },
+
+        imageLoaded: function(event) {
             // Create a new div with the image as background
             var div = $('<div id="mockup-overlay"></div>').css({
                 'position': 'absolute',
-                'top': options.top,
-                'left': options.left,
-                'width': image.width,
-                'height': image.height,
+                'top': this.options.top,
+                'left': this.options.left,
+                'width': event.target.width,
+                'height': event.target.height,
                 'z-index': 10000,
-                'background': 'url(' + image.src + ')',
-                'display': isVisible ? 'block' : 'none',
-                'opacity': opacity
+                'background': 'url(' + this.url + ')',
+                // 'display': this.options.isVisible ? 'block' : 'none',
+                'opacity': this.options.opacity
             });
+            $('body').append(div);
 
-            // Use keyboard input to control the opacity
-            $(window).on('keyup', function (event) {
+            this.addKeyboardListeners();
+        },
+
+        addKeyboardListeners: function() {
+            $(window).on('keyup', function(event) {
                 var overlay = $('#mockup-overlay');
+
                 switch (event.keyCode) {
                     case 83:
                         overlay.show();
@@ -87,13 +93,12 @@
                             opacity = options.opacity;
                         }
                 }
+
                 overlay.css({
                     'opacity': opacity
                 });
             });
-            return container.prepend(div);
-
-        };
+        }
     };
 
     $.fn[pluginName] = function (options) {
