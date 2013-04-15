@@ -56,7 +56,7 @@
                 'height': event.target.height,
                 'z-index': 10000,
                 'background': 'url(' + this.url + ')',
-                // 'display': this.options.isVisible ? 'block' : 'none',
+                'display': this.options.visible ? 'block' : 'none',
                 'opacity': this.options.opacity
             });
             $('body').append(div);
@@ -68,6 +68,7 @@
             $(window).on('keyup', function(event) {
                 var overlay = $('#mockup-overlay');
 
+                // TODO: Rethink about keyboard controls
                 switch (event.keyCode) {
                     case 83:
                         overlay.show();
