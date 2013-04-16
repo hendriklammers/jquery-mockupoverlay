@@ -93,13 +93,24 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
+.main-wrap {
+    position: relative;
+    width: 960px;
+    margin: 0 auto;
+}
 
+.site-head {
+    background: #44d7ee;
+    height: 200px;
+}
 
+.site-head h1 {
+    text-align: center;
+}
 
-
-
-
-
+.test-div {
+    position: relative;
+}
 
 
 

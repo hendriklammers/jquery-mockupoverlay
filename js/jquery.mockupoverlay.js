@@ -9,6 +9,7 @@
  * http://www.hendriklammers.com
  */
 // TODO: Add options for the container and front/back
+// TODO: Add visual controls
 ;(function ($, window, undefined) {
     'use strict';
 
@@ -26,9 +27,10 @@
         this.element = element;
         this.url = url;
 
+        // Extend options
         this.options = $.extend({}, defaults, options);
-
         this._defaults = defaults;
+
         this._name = pluginName;
 
         this.init();
@@ -36,13 +38,10 @@
 
     Plugin.prototype = {
         init: function() {
-
-            var self = this;
-
             // Create a new image and wait for it to be loaded
             var image = new Image();
             image.src = this.url;
-            // TODO: Add polyfill?
+            // TODO: Add bind polyfill?
             image.onload = this.imageLoaded.bind(this);
         },
 
@@ -54,12 +53,12 @@
                 'left': this.options.left,
                 'width': event.target.width,
                 'height': event.target.height,
-                'z-index': 10000,
+                'z-index': 0,
                 'background': 'url(' + this.url + ')',
                 'display': this.options.visible ? 'block' : 'none',
                 'opacity': this.options.opacity
             });
-            $('body').append(div);
+            $(this.element).append(div);
 
             this.addKeyboardListeners();
         },
@@ -70,35 +69,35 @@
 
                 // TODO: Rethink about keyboard controls
                 switch (event.keyCode) {
-                    case 83:
+                    case 83:    // s
                         overlay.show();
-                        isVisible = true;
+                        this.options.visible = true;
                         break;
-                    case 72:
+                    case 72:    // h
                         overlay.hide();
-                        isVisible = false;
-                        // opacity = 0.3;
+                        this.options.visible = false;
                         break;
-                    case 188:
-                        if (isVisible && opacity.toFixed(2) > 0.1) {
-                            opacity -= 0.1;
+                    case 188:   // comma
+                        if (this.options.visible && this.options.opacity.toFixed(2) > 0.1) {
+                            this.options.opacity -= 0.1;
                         }
                         break;
-                    case 190:
-                        if (isVisible && opacity.toFixed(2) < 1) {
-                            opacity += 0.1;
+                    case 190:   // period
+                        if (this.options.visible && this.options.opacity.toFixed(2) < 1) {
+                            this.options.opacity += 0.1;
                         }
                         break;
-                    case 191:
-                        if (isVisible) {
-                            opacity = options.opacity;
+                    case 191:   // forward slash
+                        // Reset opacity to default
+                        if (this.options.visible) {
+                            this.options.opacity = this._defaults.opacity;
                         }
                 }
 
                 overlay.css({
-                    'opacity': opacity
+                    'opacity': this.options.opacity
                 });
-            });
+            }.bind(this));
         }
     };
 
