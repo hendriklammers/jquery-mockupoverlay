@@ -105,7 +105,9 @@ textarea {
 }
 
 .site-head h1 {
+    position: relative;
     text-align: center;
+    color: #ee4be9;
 }
 
 .test-div {

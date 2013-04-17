@@ -8,8 +8,8 @@
  *
  * http://www.hendriklammers.com
  */
-// TODO: Add options for the container and front/back
-// TODO: Add visual controls
+// TODO: Add options for the container and front/back, fix order
+// TODO: Horizontal/Vertical centering
 ;(function ($, window, undefined) {
     'use strict';
 
@@ -20,7 +20,8 @@
             top: 0,
             left: 0,
             opacity: 0.3,
-            visible: true
+            visible: true,
+            order: 'front'
         };
 
     function Plugin(element, url, options) {
@@ -46,36 +47,43 @@
         },
 
         imageLoaded: function(event) {
+            // Store width and height of the image
+            this.width = event.target.width;
+            this.height = event.target.height;
             // Create a new div with the image as background
-            var div = $('<div id="mockup-overlay"></div>').css({
-                'position': 'absolute',
-                'top': this.options.top,
-                'left': this.options.left,
-                'width': event.target.width,
-                'height': event.target.height,
-                'z-index': 0,
-                'background': 'url(' + this.url + ')',
-                'display': this.options.visible ? 'block' : 'none',
-                'opacity': this.options.opacity
-            });
-            $(this.element).append(div);
+            this.overlay = $('<div id="mockup-overlay"></div>');
+
+            // Add newly created overlay to the selected element
+            $(this.element).prepend(this.overlay);
+
+            // Update the appearance of the overlay
+            this.updateOverlay();
 
             this.addKeyboardListeners();
         },
 
-        addKeyboardListeners: function() {
-            $(window).on('keyup', function(event) {
-                var overlay = $('#mockup-overlay');
+        updateOverlay: function() {
+            this.overlay.css({
+                'position': 'absolute',
+                'top': this.options.top,
+                'left': this.options.left,
+                // z-index only works properly when the position of siblings is set
+                'z-index': this.options.order === 'back' ? 0 : 9999,
+                'width': this.width,
+                'height': this.height,
+                'background': 'url(' + this.url + ')',
+                'display': this.options.visible ? 'block' : 'none',
+                'opacity': this.options.opacity
+            });
+        },
 
-                // TODO: Rethink about keyboard controls
+        addKeyboardListeners: function() {
+            $(window).on('keydown', function(event) {
+                // TODO: Add visual confirmation
                 switch (event.keyCode) {
-                    case 83:    // s
-                        overlay.show();
-                        this.options.visible = true;
-                        break;
-                    case 72:    // h
-                        overlay.hide();
-                        this.options.visible = false;
+                    case 77:    // s
+                        // Show/Hide toggle
+                        this.options.visible = this.options.visible ? false : true;
                         break;
                     case 188:   // comma
                         if (this.options.visible && this.options.opacity.toFixed(2) > 0.1) {
@@ -88,25 +96,46 @@
                         }
                         break;
                     case 191:   // forward slash
-                        // Reset opacity to default
-                        if (this.options.visible) {
-                            this.options.opacity = this._defaults.opacity;
-                        }
+                        // front/back toggle - Only works when position of sibblings/parent is set in css
+                        this.options.order = this.options.order === 'front' ? 'back' : 'front';
+                        break;
                 }
 
-                overlay.css({
-                    'opacity': this.options.opacity
-                });
+                // Update with new settings
+                this.updateOverlay();
+
             }.bind(this));
         }
     };
 
-    $.fn[pluginName] = function (options) {
+    $.fn[pluginName] = function (url, options) {
         return this.each(function () {
             if (!$.data(this, 'plugin_' + pluginName)) {
-                $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
+                $.data(this, 'plugin_' + pluginName, new Plugin(this, url, options));
             }
         });
     };
 
 }(jQuery, window));
+
+// Mozilla bind polyfill
+if (!Function.prototype.bind) {
+    Function.prototype.bind = function (oThis) {
+        if (typeof this !== "function") {
+            // closest thing possible to the ECMAScript 5 internal IsCallable function
+            throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+        }
+
+        var aArgs = Array.prototype.slice.call(arguments, 1),
+            fToBind = this,
+            fNOP = function () {},
+            fBound = function () {
+                return fToBind.apply(this instanceof fNOP && oThis ? this : oThis, aArgs.concat(Array.prototype.slice.call(arguments)));
+            };
+
+        fNOP.prototype = this.prototype;
+        fBound.prototype = new fNOP();
+
+        return fBound;
+    };
+}
