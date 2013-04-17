@@ -8,7 +8,6 @@
  *
  * http://www.hendriklammers.com
  */
-// TODO: Horizontal/Vertical centering
 ;(function ($, window, undefined) {
     'use strict';
 
@@ -20,7 +19,8 @@
             left: 0,
             opacity: 0.3,
             visible: true,
-            order: 'front'
+            order: 'front',     // back
+            center: 'none'      // both, vertical, horizontal
         };
 
     function Plugin(element, url, options) {
@@ -36,6 +36,9 @@
     }
 
     Plugin.prototype = {
+        width: 0,
+        height: 0,
+
         init: function() {
             // Create a new div and add to the element which the plugin is called on
             this.overlay = $('<div id="mockup-overlay"></div>').prependTo(this.element);
@@ -61,10 +64,32 @@
         },
 
         updateOverlay: function() {
+            var top, left;
+
+            switch (this.options.center) {
+                case 'horizontal':
+                    top = this.options.top;
+                    left = ($(this.element).innerWidth() - this.width) / 2;
+                    break;
+                case 'vertical':
+                    // TODO: Use window height when plugin is called on body
+                    left = this.options.left;
+                    top = ($(this.element).innerHeight() - this.height) / 2;
+                    break;
+                case 'both':
+                    top = ($(this.element).innerHeight() - this.height) / 2;
+                    left = ($(this.element).innerWidth() - this.width) / 2;
+                    break;
+                default:
+                    top = this.options.top;
+                    left = this.options.left;
+                    break;
+            }
+
             this.overlay.css({
                 'position': 'absolute',
-                'top': this.options.top,
-                'left': this.options.left,
+                'top': top,
+                'left': left,
                 // z-index only works properly when the position of siblings is set
                 'z-index': this.options.order === 'back' ? 0 : 9999,
                 'width': this.width,
@@ -112,6 +137,15 @@
                 $.data(this, 'plugin_' + pluginName, new Plugin(this, url, options));
             }
         });
+    };
+
+    $.fn.center = function () {
+        this.css("position","absolute");
+        this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) + 
+                                                    $(window).scrollTop()) + "px");
+        this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) + 
+                                                    $(window).scrollLeft()) + "px");
+        return this;
     };
 
 }(jQuery, window));
