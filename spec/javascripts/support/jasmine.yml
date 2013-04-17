@@ -1,0 +1,17 @@
+src_files:
+    - 'js/vendor/*.js'
+    - 'js/**/*.js'
+
+stylesheets:
+  - 'css/normalize.css'
+  - 'css/main.css'
+
+helpers:
+  - 'helpers/**/*.js'
+
+spec_files:
+  - '**/*[sS]pec.js'
+
+src_dir:
+
+spec_dir:
