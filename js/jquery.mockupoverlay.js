@@ -8,7 +8,6 @@
  *
  * http://www.hendriklammers.com
  */
-// TODO: Add options for the container and front/back, fix order
 // TODO: Horizontal/Vertical centering
 ;(function ($, window, undefined) {
     'use strict';
@@ -27,7 +26,6 @@
     function Plugin(element, url, options) {
         this.element = element;
         this.url = url;
-
         // Extend options
         this.options = $.extend({}, defaults, options);
         this._defaults = defaults;
@@ -39,10 +37,15 @@
 
     Plugin.prototype = {
         init: function() {
+            // Create a new div and add to the element which the plugin is called on
+            this.overlay = $('<div id="mockup-overlay"></div>').prependTo(this.element);
+
+            // Update the appearance of the overlay
+            this.updateOverlay();
+
             // Create a new image and wait for it to be loaded
             var image = new Image();
             image.src = this.url;
-            // TODO: Add bind polyfill?
             image.onload = this.imageLoaded.bind(this);
         },
 
@@ -50,11 +53,6 @@
             // Store width and height of the image
             this.width = event.target.width;
             this.height = event.target.height;
-            // Create a new div with the image as background
-            this.overlay = $('<div id="mockup-overlay"></div>');
-
-            // Add newly created overlay to the selected element
-            $(this.element).prepend(this.overlay);
 
             // Update the appearance of the overlay
             this.updateOverlay();
