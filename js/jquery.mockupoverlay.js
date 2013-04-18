@@ -49,7 +49,7 @@
             // Create a new image and wait for it to be loaded
             var image = new Image();
             image.src = this.url;
-            image.onload = this.imageLoaded.bind(this);
+            image.onload = $.proxy(this.imageLoaded, this);
         },
 
         imageLoaded: function(event) {
@@ -101,7 +101,7 @@
         },
 
         addKeyboardListeners: function() {
-            $(window).on('keydown', function(event) {
+            $(window).on('keydown', $.proxy(function(event) {
                 // TODO: Add visual confirmation
                 switch (event.keyCode) {
                     case 77:    // s
@@ -127,7 +127,7 @@
                 // Update with new settings
                 this.updateOverlay();
 
-            }.bind(this));
+            }, this));
         }
     };
 
@@ -139,35 +139,4 @@
         });
     };
 
-    $.fn.center = function () {
-        this.css("position","absolute");
-        this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) + 
-                                                    $(window).scrollTop()) + "px");
-        this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) + 
-                                                    $(window).scrollLeft()) + "px");
-        return this;
-    };
-
 }(jQuery, window));
-
-// Mozilla bind polyfill
-if (!Function.prototype.bind) {
-    Function.prototype.bind = function (oThis) {
-        if (typeof this !== "function") {
-            // closest thing possible to the ECMAScript 5 internal IsCallable function
-            throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
-        }
-
-        var aArgs = Array.prototype.slice.call(arguments, 1),
-            fToBind = this,
-            fNOP = function () {},
-            fBound = function () {
-                return fToBind.apply(this instanceof fNOP && oThis ? this : oThis, aArgs.concat(Array.prototype.slice.call(arguments)));
-            };
-
-        fNOP.prototype = this.prototype;
-        fBound.prototype = new fNOP();
-
-        return fBound;
-    };
-}
