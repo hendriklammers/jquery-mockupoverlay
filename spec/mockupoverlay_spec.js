@@ -32,4 +32,23 @@ describe("mockupOverlay jQuery plugin", function() {
     expect(container.find('#mockup-overlay').css('display')).toBe('none');
   });
 
+  it("should use a z-index of 0 when order is set to back", function() {
+    container.mockupOverlay('img/sample_design.jpg', {order: 'back'});
+    expect(container.find('#mockup-overlay').css('z-index')).toBe('0');
+  });
+  
+  it("should use a z-index of 9999 when order is set to front", function() {
+    container.mockupOverlay('img/sample_design.jpg', {order: 'front'});
+    expect(container.find('#mockup-overlay').css('z-index')).toBe('9999');
+  });
+
+  it("should be able to take an opacity in the options", function() {
+    container.mockupOverlay('img/sample_design.jpg', {opacity: 0.7});
+
+    // 0.7 sometimes becomes '0.699999999342324'
+    // Convert to integer and round to testable value
+    var num = Math.round(+container.find('#mockup-overlay').css('opacity') * 100) / 100;
+    expect(num).toEqual(0.7);
+  });
+
 });
