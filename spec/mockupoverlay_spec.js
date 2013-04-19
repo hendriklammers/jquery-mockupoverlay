@@ -1,10 +1,16 @@
 describe("mockupOverlay jQuery plugin", function() {
 
-	// Element to work with
 	var container,
       pluginReady,
+
       readyCallback = function() {
         pluginReady = true;
+      },
+      waiting = function() {
+        // Waits for readyCallback to be called
+        waitsFor(function() {
+          return pluginReady;
+        }, 'Plugin not working correctly', 2000);
       };
 
   beforeEach(function() {
@@ -38,9 +44,7 @@ describe("mockupOverlay jQuery plugin", function() {
   it("should have a visible option to set the visibility", function() {
     container.mockupOverlay('img/sample_design.jpg', {visible: false, onReady: readyCallback});
 
-    waitsFor(function() {
-      return pluginReady;
-    }, 'Plugin not working correctly', 2000);
+    waiting();
 
     runs(function() {
       expect(container.find('#mockup-overlay').css('display')).toBe('none');
@@ -50,9 +54,7 @@ describe("mockupOverlay jQuery plugin", function() {
   it("should use a z-index of 0 when order is set to back", function() {
     container.mockupOverlay('img/sample_design.jpg', {order: 'back', onReady: readyCallback});
 
-    waitsFor(function() {
-      return pluginReady;
-    }, 'Plugin not working correctly', 2000);
+    waiting();
 
     runs(function() {
       expect(container.find('#mockup-overlay').css('z-index')).toBe('0');
@@ -62,9 +64,7 @@ describe("mockupOverlay jQuery plugin", function() {
   it("should use a z-index of 9999 when order is set to front", function() {
     container.mockupOverlay('img/sample_design.jpg', {order: 'front', onReady: readyCallback});
 
-    waitsFor(function() {
-      return pluginReady;
-    }, 'Plugin not working correctly', 2000);
+    waiting();
 
     runs(function() {
       expect(container.find('#mockup-overlay').css('z-index')).toBe('9999');
@@ -74,9 +74,7 @@ describe("mockupOverlay jQuery plugin", function() {
   it("should be able to take an opacity in the options", function() {
     container.mockupOverlay('img/sample_design.jpg', {opacity: 0.7, onReady: readyCallback});
 
-    waitsFor(function() {
-      return pluginReady;
-    }, 'Plugin not working correctly', 2000);
+    waiting();
 
     runs(function() {
       // 0.7 sometimes becomes '0.699999999342324'
