@@ -33,7 +33,11 @@
         <script src="js/jquery.mockupoverlay.js"></script>
         <script>
             (function() {
-                $('body').mockupOverlay('img/sample_design.jpg', {center: 'both', opacity: 0.8, order: 'back'});
+                var callback = function() {
+                    console.log('Plugin is ready!');
+                };
+
+                $('body').mockupOverlay('img/sample_design.jpg', {center: 'both', opacity: 0.8, order: 'back', onReady: callback});
             }());
         </script>
     </body>
