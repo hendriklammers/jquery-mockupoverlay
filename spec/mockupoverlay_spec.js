@@ -1,8 +1,14 @@
 describe("mockupOverlay jQuery plugin", function() {
 
 	// Element to work with
-	var container;
+	var container,
+      pluginReady,
+      readyCallback = function() {
+        pluginReady = true;
+      };
+
   beforeEach(function() {
+    pluginReady = false;
     container = $('<div id="container"></div>').appendTo('body');
   });
 
@@ -27,28 +33,57 @@ describe("mockupOverlay jQuery plugin", function() {
   	expect(container.find('#mockup-overlay').length).toEqual(1);
   });
 
+// Use async to make the following tests pass
+
   it("should have a visible option to set the visibility", function() {
-    container.mockupOverlay('img/sample_design.jpg', {visible: false});
-    expect(container.find('#mockup-overlay').css('display')).toBe('none');
+    container.mockupOverlay('img/sample_design.jpg', {visible: false, onReady: readyCallback});
+
+    waitsFor(function() {
+      return pluginReady;
+    }, 'Plugin not working correctly', 2000);
+
+    runs(function() {
+      expect(container.find('#mockup-overlay').css('display')).toBe('none');
+    });
   });
 
   it("should use a z-index of 0 when order is set to back", function() {
-    container.mockupOverlay('img/sample_design.jpg', {order: 'back'});
-    expect(container.find('#mockup-overlay').css('z-index')).toBe('0');
+    container.mockupOverlay('img/sample_design.jpg', {order: 'back', onReady: readyCallback});
+
+    waitsFor(function() {
+      return pluginReady;
+    }, 'Plugin not working correctly', 2000);
+
+    runs(function() {
+      expect(container.find('#mockup-overlay').css('z-index')).toBe('0');
+    });
   });
   
   it("should use a z-index of 9999 when order is set to front", function() {
-    container.mockupOverlay('img/sample_design.jpg', {order: 'front'});
-    expect(container.find('#mockup-overlay').css('z-index')).toBe('9999');
+    container.mockupOverlay('img/sample_design.jpg', {order: 'front', onReady: readyCallback});
+
+    waitsFor(function() {
+      return pluginReady;
+    }, 'Plugin not working correctly', 2000);
+
+    runs(function() {
+      expect(container.find('#mockup-overlay').css('z-index')).toBe('9999');
+    });
   });
 
   it("should be able to take an opacity in the options", function() {
-    container.mockupOverlay('img/sample_design.jpg', {opacity: 0.7});
+    container.mockupOverlay('img/sample_design.jpg', {opacity: 0.7, onReady: readyCallback});
 
-    // 0.7 sometimes becomes '0.699999999342324'
-    // Convert to integer and round to testable value
-    var num = Math.round(+container.find('#mockup-overlay').css('opacity') * 100) / 100;
-    expect(num).toEqual(0.7);
+    waitsFor(function() {
+      return pluginReady;
+    }, 'Plugin not working correctly', 2000);
+
+    runs(function() {
+      // 0.7 sometimes becomes '0.699999999342324'
+      // Convert to integer and round to testable value
+      var num = Math.round(+container.find('#mockup-overlay').css('opacity') * 100) / 100;
+      expect(num).toEqual(0.7);
+    });
   });
 
 });

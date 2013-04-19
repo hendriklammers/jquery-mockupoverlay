@@ -20,7 +20,8 @@
             opacity: 0.3,
             visible: true,
             order: 'front',     // back
-            center: 'none'      // both, vertical, horizontal
+            center: 'none',     // both, vertical, horizontal
+            onReady: null
         };
 
     function Plugin(element, url, options) {
@@ -43,9 +44,6 @@
             // Create a new div and add to the element which the plugin is called on
             this.overlay = $('<div id="mockup-overlay"></div>').prependTo(this.element);
 
-            // Update the appearance of the overlay
-            this.updateOverlay();
-
             // Create a new image and wait for it to be loaded
             var image = new Image();
             image.src = this.url;
@@ -61,6 +59,11 @@
             this.updateOverlay();
 
             this.addKeyboardListeners();
+
+            // When user added a callback function, call it
+            if (typeof this.options.onReady === 'function') {
+                this.options.onReady();
+            }
         },
 
         updateOverlay: function() {
